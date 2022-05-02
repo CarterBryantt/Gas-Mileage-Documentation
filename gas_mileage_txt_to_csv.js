@@ -1,49 +1,49 @@
-let input = document.getElementById('file-input');
+// let input = document.getElementById('file-input');
 
-input.onchange = (e) => {
-	let fileReader = new FileReader();
-	fileReader.onload = (f) => {
-		let text = f.target.result;
+// input.onchange = (e) => {
+// 	let fileReader = new FileReader();
+// 	fileReader.onload = (f) => {
+// 		let text = f.target.result;
 
-		let regex = /([a-zA-Z]+):?\s?([0-9]+:[0-9]+)(\n\s{4}-\s(.+))?(\n\s{4}-\s(.+))?/g;
-		let matches = text.matchAll(regex); // Returns iterable
-		matches = Array.from(matches); // Convert iterable to array
-		let csv = "data:text/csv;charset=utf-8,";
-		let odometerValue = "";
-		let gasLevel = "";
-		matches.forEach(match => {
-			match.shift();
-			match.splice(2, 1);
-			match.splice(3, 1);
-			match = match.filter(item => item != undefined);
-			let time = `${match[0]} Time,${match[1]}`;
-			if (match.length > 2) {
-				if (match.length == 3) {
-					if (isNaN(Number(match[2]))) {
-						match[2] = match[2].replaceAll("Full", "1/1");
-						gasLevel = "Gas Level,=" + (match[2].slice(0, 10) == "Refuel -> " ? match[2].slice(10) + ",Refuel" : match[2]);
-					} else {
-						odometerValue = `Odometer Value,${match[2]}`;
-					}
-				} else {
-					odometerValue = `Odometer Value,${match[2]}`;
-					match[3] = match[3].replace("Full", "1/1");
-					gasLevel = "Gas Level,=" + (match[3].slice(0, 10) == "Refuel -> " ? match[3].slice(10) + ",Refuel" : match[3]);
-				}
-			}
+// 		let regex = /([a-zA-Z]+):?\s?([0-9]+:[0-9]+)(\n\s{4}-\s(.+))?(\n\s{4}-\s(.+))?/g;
+// 		let matches = text.matchAll(regex); // Returns iterable
+// 		matches = Array.from(matches); // Convert iterable to array
+// 		let csv = "data:text/csv;charset=utf-8,";
+// 		let odometerValue = "";
+// 		let gasLevel = "";
+// 		matches.forEach(match => {
+// 			match.shift();
+// 			match.splice(2, 1);
+// 			match.splice(3, 1);
+// 			match = match.filter(item => item != undefined);
+// 			let time = `${match[0]} Time,${match[1]}`;
+// 			if (match.length > 2) {
+// 				if (match.length == 3) {
+// 					if (isNaN(Number(match[2]))) {
+// 						match[2] = match[2].replaceAll("Full", "1/1");
+// 						gasLevel = "Gas Level,=" + (match[2].slice(0, 10) == "Refuel -> " ? match[2].slice(10) + ",Refuel" : match[2]);
+// 					} else {
+// 						odometerValue = `Odometer Value,${match[2]}`;
+// 					}
+// 				} else {
+// 					odometerValue = `Odometer Value,${match[2]}`;
+// 					match[3] = match[3].replace("Full", "1/1");
+// 					gasLevel = "Gas Level,=" + (match[3].slice(0, 10) == "Refuel -> " ? match[3].slice(10) + ",Refuel" : match[3]);
+// 				}
+// 			}
 			
-			csv += time + "\n" + odometerValue + "\n" + gasLevel + "\n";
-		});
+// 			csv += time + "\n" + odometerValue + "\n" + gasLevel + "\n";
+// 		});
 		
-		let content = encodeURI(csv);
-		let link = document.createElement('a');
-		link.setAttribute('href', content);
-		link.setAttribute('download', 'gas_mileage.csv');
-		document.body.appendChild(link);
-		link.click();
-	};
-	fileReader.readAsText(e.target.files[0]);
-}
+// 		let content = encodeURI(csv);
+// 		let link = document.createElement('a');
+// 		link.setAttribute('href', content);
+// 		link.setAttribute('download', 'gas_mileage.csv');
+// 		document.body.appendChild(link);
+// 		link.click();
+// 	};
+// 	fileReader.readAsText(e.target.files[0]);
+// }
 
 function createSVG(x, y) {
 	let svg = `
