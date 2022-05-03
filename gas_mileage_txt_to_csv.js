@@ -1,49 +1,60 @@
-// let input = document.getElementById('file-input');
+let input = document.getElementById('file-input');
 
-// input.onchange = (e) => {
-// 	let fileReader = new FileReader();
-// 	fileReader.onload = (f) => {
-// 		let text = f.target.result;
+input.onchange = (e) => {
+	let fileReader = new FileReader();
+	fileReader.onload = (f) => {
+		let text = f.target.result;
 
-// 		let regex = /([a-zA-Z]+):?\s?([0-9]+:[0-9]+)(\n\s{4}-\s(.+))?(\n\s{4}-\s(.+))?/g;
-// 		let matches = text.matchAll(regex); // Returns iterable
-// 		matches = Array.from(matches); // Convert iterable to array
-// 		let csv = "data:text/csv;charset=utf-8,";
-// 		let odometerValue = "";
-// 		let gasLevel = "";
-// 		matches.forEach(match => {
-// 			match.shift();
-// 			match.splice(2, 1);
-// 			match.splice(3, 1);
-// 			match = match.filter(item => item != undefined);
-// 			let time = `${match[0]} Time,${match[1]}`;
-// 			if (match.length > 2) {
-// 				if (match.length == 3) {
-// 					if (isNaN(Number(match[2]))) {
-// 						match[2] = match[2].replaceAll("Full", "1/1");
-// 						gasLevel = "Gas Level,=" + (match[2].slice(0, 10) == "Refuel -> " ? match[2].slice(10) + ",Refuel" : match[2]);
-// 					} else {
-// 						odometerValue = `Odometer Value,${match[2]}`;
-// 					}
-// 				} else {
-// 					odometerValue = `Odometer Value,${match[2]}`;
-// 					match[3] = match[3].replace("Full", "1/1");
-// 					gasLevel = "Gas Level,=" + (match[3].slice(0, 10) == "Refuel -> " ? match[3].slice(10) + ",Refuel" : match[3]);
-// 				}
-// 			}
+		let regex = /([a-zA-Z]+):?\s?([0-9]+:[0-9]+)(\n\s{4}-\s(.+))?(\n\s{4}-\s(.+))?/g;
+		let matches = text.matchAll(regex); // Returns iterable
+		matches = Array.from(matches); // Convert iterable to array
+		let csv = "data:text/csv;charset=utf-8,";
+		let odometerValue = "";
+		let gasLevel = "";
+		let gasString = "";
+		matches.forEach(match => {
+			match.shift();
+			match.splice(2, 1);
+			match.splice(3, 1);
+			match = match.filter(item => item != undefined);
+			let time = `${match[0]} Time,${match[1]}`;
+			if (match.length > 2) {
+				if (match.length == 3) {
+					if (isNaN(Number(match[2]))) {
+						match[2] = match[2].replaceAll("Full", "1/1");
+						gasLevel = "Gas Level,=" + (match[2].slice(0, 10) == "Refuel -> " ? match[2].slice(10) + ",Refuel" : match[2]);
+						gasString = match[2].slice(0, 10) == "Refuel -> " ? match[2].slice(10) : match[2];
+					} else {
+						odometerValue = `Odometer Value,${match[2]}`;
+					}
+				} else {
+					odometerValue = `Odometer Value,${match[2]}`;
+					match[3] = match[3].replace("Full", "1/1");
+					gasLevel = "Gas Level,=" + (match[3].slice(0, 10) == "Refuel -> " ? match[3].slice(10) + ",Refuel" : match[3]);
+					gasString = match[3].slice(0, 10) == "Refuel -> " ? match[3].slice(10) : match[3]
+				}
+			}
+
+			let value = getDecimalFromFrac(gasString);
+			let scaledValue = ((value * (21.8 - 158.2)) + 158.2) * (Math.PI / 180);
+			let x = 190 * Math.cos(scaledValue);
+			let y = 190 * Math.sin(scaledValue);
+			console.log(odometerValue.slice(15), value, scaledValue, x, y);
+			createSVG(x+250, 300-y);
 			
-// 			csv += time + "\n" + odometerValue + "\n" + gasLevel + "\n";
-// 		});
+			csv += time + "\n" + odometerValue + "\n" + gasLevel + "\n";
+		});
 		
-// 		let content = encodeURI(csv);
-// 		let link = document.createElement('a');
-// 		link.setAttribute('href', content);
-// 		link.setAttribute('download', 'gas_mileage.csv');
-// 		document.body.appendChild(link);
-// 		link.click();
-// 	};
-// 	fileReader.readAsText(e.target.files[0]);
-// }
+		// let content = encodeURI(csv);
+		// let link = document.createElement('a');
+		// link.setAttribute('href', content);
+		// link.setAttribute('download', 'gas_mileage.csv');
+		// document.body.appendChild(link);
+		// link.click();
+	};
+	
+	fileReader.readAsText(e.target.files[0]);
+}
 
 function createSVG(x, y) {
 	let svg = `
@@ -72,10 +83,43 @@ function createSVG(x, y) {
 	document.body.appendChild(dial);
 }
 
-for (let i = 0; i <= 1; i += 0.0625) {
-	let scaledValue = ((i * (21.8 - 158.2)) + 158.2) * (Math.PI / 180);
-	let x = 190 * Math.cos(scaledValue);
-	let y = 190 * Math.sin(scaledValue);
-	console.log(i, scaledValue, x, y)
-	createSVG(x+250, 300-y);
+// for (let i = 0; i <= 1; i += 0.0625) {
+// 	let scaledValue = ((i * (21.8 - 158.2)) + 158.2) * (Math.PI / 180);
+// 	let x = 190 * Math.cos(scaledValue);
+// 	let y = 190 * Math.sin(scaledValue);
+// 	console.log(i, scaledValue, x, y)
+// 	createSVG(x+250, 300-y);
+// }
+
+function getDecimalFromFrac(string) {
+	let fractionMatch = /\d+\/\d+/g;
+	let operatorMatch = /\+|\-/g;
+
+	let decimals = [];
+	let fractions = [...string.matchAll(fractionMatch)];
+	fractions.forEach(f => {
+		let fraction = f[0];
+		let parts = fraction.split("/");
+		decimals.push(parseInt(parts[0]) / parseInt(parts[1]));
+	});
+
+	if (string.match(operatorMatch) === null) {
+		return decimals[0];
+	}
+
+	let operators = string.match(operatorMatch);
+	let total = decimals[0];
+
+	for (let i = 0; i < operators.length; i++) {
+		switch (operators[i]) {
+			case "+":
+				total += decimals[i+1];
+				break;
+			case "-":
+				total -= decimals[i+1];
+				break;
+		}
+	}
+
+	return total;
 }
