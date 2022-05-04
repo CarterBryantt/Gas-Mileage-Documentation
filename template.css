@@ -1,0 +1,27 @@
+* {
+	-webkit-touch-callout: none; /* iOS Safari */
+	-webkit-user-select: none; /* Safari */
+	-khtml-user-select: none; /* Konqueror HTML */
+	-moz-user-select: none; /* Old versions of Firefox */
+	-ms-user-select: none; /* Internet Explorer/Edge */
+	user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
+td {
+	border: 2px solid #373737;
+}
+
+td:nth-child(odd) {
+	text-align: start;
+}
+
+td:nth-child(even) {
+	text-align: end;
+}
+
+.trip-row {
+	margin-left: 15px;
+	display: flex;
+	flex-direction: row;
+
+}
